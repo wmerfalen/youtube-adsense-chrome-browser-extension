@@ -1,7 +1,7 @@
 {
-  "name": "Getting Started Example",
-  "version": "1.0",
-  "description": "Build an Extension!",
+  "name": "N.I. (Not Interested)",
+  "version": "1.1",
+  "description": "The idea is that people will use the button to stop annoying, obnoxious distasteful adds. Or ads promoting products or services you would just simply never think about buying for one reason or the other. Consumers will have given the option of a positive advertising experience. We are exposed to a ridiculous amount of ads every day and people are starting to question its toll on society. Although clearly useful and vastly important it doesn’t mean advertising doesn’t have its problems. It’s interesting when you look at exactly whose making consumer choices. The power of choice should be given to the consumer. We think Google kind of thinks this way too.", 
   "permissions": ["activeTab", "declarativeContent", "storage"],
   "options_page": "options.html",
   "background": {
