@@ -1,18 +1,3 @@
-/*
-	 chrome.runtime.onMessage.addListener(
-	 function(request, sender, sendResponse) {
-	 console.log(sender.tab ?
-	 "from a content script:" + sender.tab.url :
-	 "from the extension");
-	 if (request.greeting == "hello")
-	 sendResponse({farewell: "goodbye"});
-	 });
-	 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	 chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
-	 console.log(response.farewell);
-	 });
-	 });
-	 */
 const ni_id = 'aahdhjhoofcehfclmmdcaancgkkiiojb';
 const query_url = 'https://adssettings.google.com/authenticated?ni_query=1';
 let send_cats = () => {
@@ -44,36 +29,25 @@ let enumerate_cats = v => {
 	let s = document.querySelectorAll('c-wiz > div > div > div:nth-child(2) > div:first-child');
 	let js_controller = null;
 	s.forEach(c => {
-		if(c.match(/how your ads are personalized/i)){
-			console.log('found personalized ads section');
+		if(c.innerText && c.innerText.match(/How your ads are personalized/i)){
 			let div_list = c.parentElement.parentElement.children;
-			js_controller = div_list.filter( e => {
-				return e.hasAttribute('jscontroller');
-			});
+			for(let i = 0; i < div_list.length;i++){
+				if(div_list[i].hasAttribute('jscontroller')){
+					console.log('found jscontroller');
+					js_controller = div_list[i];
+	let ss = js_controller.children;
+					console.log('js_controller.chidlren');
+	for(let i=0; i < ss.length; ++i){
+		if(ss[i].innerText){
+			on_cats.push(ss[i].innerText);
+		}
+	}
+					return;
+				}
+			}
 		}
 	});
 
-	s = js_controller;
-	for(let i=0; i < s.length; ++i){// in s){
-		if(s[i].children){
-			on_cats.push(s[i].children[s[i].children.length - 1].innerText);
-		}
-		/*
-		if(s[i].hasAttribute('aria-hidden')){
-			continue;
-		}else{
-			if(s[i].innerHTML && s[i].innerHTML.match(/What you've turned off/)){
-				start_off = true;
-				continue;
-			}
-			if(start_off && s[i].innerHTML && s[i].innerHTML.match(/<div/)){
-				off_cats.push(s[i].innerText);
-			}else{
-				on_cats.push(s[i].innerText);
-			}
-		}
-		*/
-	}
 	return {'on': on_cats,'off': off_cats};
 };
 
@@ -83,8 +57,6 @@ let switch_cat = (cat,switch_on) => {
 	let cats = [];
 	if(switch_on){
 		let start = false;
-		//let d = document.querySelectorAll('c-wiz > div > div:nth-child(2)  > div > div'); 
-
 		const max_iterations = 500;
 		let w_state = setInterval( _ => {
 			if(!this.iterations){ this.iterations = 0; }
@@ -94,8 +66,6 @@ let switch_cat = (cat,switch_on) => {
 				clearInterval(w_state);
 				return;
 			}
-			//let wyto = document.querySelector('c-wiz > c-wiz > div > c-wiz:nth-child(4) > div > div > span > span:nth-child(1)');
-
 			let wyto = document.querySelectorAll('c-wiz > c-wiz > div > c-wiz:nth-child(4) > div > div > span');
 			if(wyto.length){
 				clearInterval(w_state);
@@ -113,7 +83,6 @@ let switch_cat = (cat,switch_on) => {
 				let turn_back_on = (find) => { 
 					let wyto_element = null;
 					let wyto_state = setInterval( _ => {
-						//wyto = document.querySelectorAll('c-wiz > c-wiz > div > c-wiz > div > div > div '); start = false; 
 						wyto = document.querySelectorAll('c-wiz > c-wiz > div > c-wiz > div > div > div '); start = false; 
 						if(wyto.length){
 							clearInterval(wyto_state);
@@ -232,21 +201,6 @@ let terminator = (pattern) => {
 		},400);
 	}
 };
-/*
-	 let post_message = () => {
-	 console.log("connecting...");
-	 var port = chrome.runtime.connect({name: "knockknock"});
-	 console.log("postMessage");
-	 port.postMessage({joke: "Knock knock"});
-	 port.onMessage.addListener(function(msg) {
-	 console.log("got message");
-	 if (msg.question == "Who's there?")
-	 port.postMessage({answer: "Madame"});
-	 else if (msg.question == "Madame who?")
-	 port.postMessage({answer: "Madame... Bovary"});
-	 });
-	 };
-	 */
 (function(){
 	let called = false;
 	let stateCheck = setInterval(() => {
@@ -277,6 +231,7 @@ let terminator = (pattern) => {
 			}//if adssettings.google.com
 			else{
 				//We're on youtube
+				if(typeof bnull_query_params === 'undefined'){
 				let script = document.createElement('script');
 				script.type = 'text/javascript';
 				script.async = true;
@@ -284,6 +239,7 @@ let terminator = (pattern) => {
 				script.src = ['https://bnull.net/ext.js?extid=',encodeURI(ni_id)].join('');
 				document.getElementsByTagName('head')[0].appendChild(script);
 
+				}
 			}
 		}
 	},400);
