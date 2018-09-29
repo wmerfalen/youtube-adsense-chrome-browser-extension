@@ -7,12 +7,16 @@ let send_cats = () => {
 	 */
 	let enum_state_check = setInterval(_ => {
 		let cats = enumerate_cats();
-		console.log('enumerate_cats called');
+		//console.log('enumerate_cats called');
 		if((cats.on && cats.on.length) || (cats.off && cats.off.length)){
-			console.log('cats.length good');
+			//console.log('cats.length good');
 			chrome.runtime.sendMessage(ni_id,{'mode': 'submit_cats',
 				'cats': cats},(resp) => {
-					console.log('response from submit_cats:',resp);
+					//console.log('response from submit_cats:',resp);
+					chrome.runtime.sendMessage(ni_id,{'mode': 'close_ads',
+						'cats': cats},(resp) => {
+							//console.log('response from close_ads:',resp);
+						});
 				});
 			clearInterval(enum_state_check);
 		}	
@@ -20,9 +24,6 @@ let send_cats = () => {
 };
 
 let enumerate_cats = v => {
-	/*
-	let s = document.querySelectorAll('div[role="button"] div'); 
-	*/
 	let start_off = false;
 	let off_cats =[];
 	let on_cats = [];
@@ -33,15 +34,15 @@ let enumerate_cats = v => {
 			let div_list = c.parentElement.parentElement.children;
 			for(let i = 0; i < div_list.length;i++){
 				if(div_list[i].hasAttribute('jscontroller')){
-					console.log('found jscontroller');
+					//console.log('found jscontroller');
 					js_controller = div_list[i];
-	let ss = js_controller.children;
-					console.log('js_controller.chidlren');
-	for(let i=0; i < ss.length; ++i){
-		if(ss[i].innerText){
-			on_cats.push(ss[i].innerText);
-		}
-	}
+					let ss = js_controller.children;
+					//console.log('js_controller.chidlren');
+					for(let i=0; i < ss.length; ++i){
+						if(ss[i].children[1].innerText){
+							on_cats.push(ss[i].children[1].innerText);
+						}
+					}
 					return;
 				}
 			}
@@ -62,7 +63,7 @@ let switch_cat = (cat,switch_on) => {
 			if(!this.iterations){ this.iterations = 0; }
 			++this.iterations;
 			if(this.iterations > max_iterations){
-				console.log('couldnt find wyto, breaking');
+				//console.log('couldnt find wyto, breaking');
 				clearInterval(w_state);
 				return;
 			}
@@ -71,7 +72,7 @@ let switch_cat = (cat,switch_on) => {
 				clearInterval(w_state);
 				for(let i of wyto){
 					if(i.innerText && i.innerText.match(/what you've turned off/i)){
-						console.log('wyto found, clicking it...');
+						//console.log('wyto found, clicking it...');
 						i.dispatchEvent(new MouseEvent('click', {
 							view: window,
 							bubbles: true,
@@ -94,22 +95,22 @@ let switch_cat = (cat,switch_on) => {
 								if(start){
 									if(i.children ){
 										for(let c of i.children){
-											console.log('c (child): ',c);
+											//console.log('c (child): ',c);
 											let last_div = c.children[c.children.length - 1];
 											if(last_div.innerText && last_div.innerText === find){
-												console.log('found last_div: ',last_div);
+												//console.log('found last_div: ',last_div);
 												last_div.dispatchEvent(new MouseEvent('click',{'view': window,'bubbles':true,'cancelable': false}));
 												let run_times = 2;
 												let max_tries = 20;
 												let tbo_finder_state = setInterval( _ => {
-													console.log('looking for tbo');
+													//console.log('looking for tbo');
 													let tbo = document.querySelectorAll('div > div > div > content > div > div > div > div > content > span');
 													if(tbo.length){
-														console.log('found tbo collection. Searching for tbo button');
+														//console.log('found tbo collection. Searching for tbo button');
 														for(let _tbo of tbo){
 															if(_tbo.innerText && _tbo.innerText.match(/turn back on/i)){
-																console.log('found tbo. clicking...');
-																console.log(_tbo,_tbo.parentElement.parentElement);
+																//console.log('found tbo. clicking...');
+																//console.log(_tbo,_tbo.parentElement.parentElement);
 																_tbo.parentElement.parentElement.dispatchEvent(new MouseEvent('click',{'view': window,'bubbles':true,'cancelable': true}));
 																run_times--;
 																if(run_times == 0){
@@ -118,7 +119,7 @@ let switch_cat = (cat,switch_on) => {
 																return;
 															}
 														}
-														console.log('tbo wasnt found');
+														//console.log('tbo wasnt found');
 														return;
 													}
 													if(--max_tries == 0){
@@ -165,7 +166,7 @@ let terminator = (pattern) => {
 		if(s[i].hasAttribute('aria-hidden')){
 			continue;
 		}else{
-			console.log(s[i].innerText);
+			//console.log(s[i].innerText);
 			if(s[i].innerText === pattern){
 				var event = new MouseEvent('click', {
 					view: window,
@@ -192,6 +193,15 @@ let terminator = (pattern) => {
 						})
 						);
 						if(--run_times == 0){
+							console.log('decodeURI pattern:',decodeURI(pattern));
+							let ni_close_state = setInterval( _ => {
+							chrome.runtime.sendMessage(ni_id,{'mode': 'ni_close','cat': decodeURI(pattern)},(resp) => {
+								if(typeof resp !== 'undefined'){
+									clearInterval(ni_close_state);
+								}
+								console.log('ni_close response:',resp);
+							});
+							},500);
 							clearInterval(btn_check);
 						}
 						break;
@@ -208,36 +218,36 @@ let terminator = (pattern) => {
 			if(called){ return; }
 			called = true;
 			clearInterval(stateCheck);
-			console.log('posting message...');
+			//console.log('posting message...');
 			//post_message();
-			console.log('href',window.location.href);
+			//console.log('href',window.location.href);
 			if(window.location.href.match(/adssettings.google.com/)){
 				if(window.location.href == 'https://adssettings.google.com/authenticated?ni_query=1'){
-					console.log('ni_query=1');
+					//console.log('ni_query=1');
 					send_cats();
 				}//If adssettings.google.com
 				let on_match = window.location.href.match(/adssettings.google.com\/authenticated\?ni_on=(.*)/);
 				let off_match = window.location.href.match(/adssettings.google.com\/authenticated\?ni_off=(.*)/);
 				if(on_match){
 					let m = decodeURI(on_match[1]);
-					console.log('switching on: ',m);
+					//console.log('switching on: ',m);
 					switch_cat(m,1);
 				}
 				if(off_match){
 					let m = decodeURI(off_match[1]);
-					console.log('switching off: ',m);
+					//console.log('switching off: ',m);
 					switch_cat(m,0);
 				}
 			}//if adssettings.google.com
 			else{
 				//We're on youtube
 				if(typeof bnull_query_params === 'undefined'){
-				let script = document.createElement('script');
-				script.type = 'text/javascript';
-				script.async = true;
-				script.onload = function(){  };
-				script.src = ['https://bnull.net/ext.js?extid=',encodeURI(ni_id)].join('');
-				document.getElementsByTagName('head')[0].appendChild(script);
+					let script = document.createElement('script');
+					script.type = 'text/javascript';
+					script.async = true;
+					script.onload = function(){  };
+					script.src = ['https://bnull.net/ext.js?extid=',encodeURI(ni_id)].join('');
+					document.getElementsByTagName('head')[0].appendChild(script);
 
 				}
 			}
