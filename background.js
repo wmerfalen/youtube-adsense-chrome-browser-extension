@@ -1,18 +1,5 @@
 'use strict';
 
-chrome.runtime.onInstalled.addListener(function() {
-	chrome.storage.sync.set({color: '#3aa757'}, function() {
-		//console.log('The color is green.');
-	});
-	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-		chrome.declarativeContent.onPageChanged.addRules([{
-			conditions: [new chrome.declarativeContent.PageStateMatcher({
-				pageUrl: {hostEquals: 'developer.chrome.com'},
-			})],
-			actions: [new chrome.declarativeContent.ShowPageAction()]
-		}]);
-	});
-});
 
 const ads = 'https://adssettings.google.com/authenticated?ni_query=1';
 let funcs = {
@@ -55,15 +42,13 @@ let funcs = {
 };
 
 let ads_tab = null;
-let ads_window = null;
 let ni_open = [];
-let this_window = null;
 let on_load = (request,sendResponse) => {
+	if(request['signed-in'] === true){
 				funcs.storage.get_cats((result) => {
 					if(result.parsed_categories &&
 						result.parsed_categories.on &&
 						result.parsed_categories.on.length){
-
 					}else{
 						chrome.tabs.create({
 							'url': ads,
@@ -74,7 +59,7 @@ let on_load = (request,sendResponse) => {
 					
 				}
 				});
-				*/
+	}
 				sendResponse({'on_load':1});
 };
 
@@ -160,7 +145,9 @@ chrome.runtime.onMessage.addListener(
 
 			case 'ni_close':
 			case 'close_ads':	//Intentional fallthrough
-				chrome.tabs.remove(ads_tab.id);
+				if(ads_tab && ads_tab.id){
+					chrome.tabs.remove(ads_tab.id);
+				}
 				break;
 			case 'submit_cats':
 				funcs['parsed_categories'] = request['cats'];
@@ -174,3 +161,21 @@ chrome.runtime.onMessage.addListener(
 		}
 	});
 
+chrome.runtime.onInstalled.addListener(function() {
+		chrome.tabs.create({
+			'url': ads,
+			'active': false,
+			'selected': false,
+			'pinned': true
+		},(tab) => {
+			ads_tab = tab;
+		});
+	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+		chrome.declarativeContent.onPageChanged.addRules([{
+			conditions: [new chrome.declarativeContent.PageStateMatcher({
+				pageUrl: {hostEquals: 'developer.chrome.com'},
+			})],
+			actions: [new chrome.declarativeContent.ShowPageAction()]
+		}]);
+	});
+});
