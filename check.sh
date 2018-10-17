@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/bjonk/chrome-ext/get_started_complete
+cd /home/bjonk/chrome-ext/not-interested
 echo 'CONTENT:'
 ~/bin/node/node -c ./content*.js
 echo 'BACKGROUND:'
