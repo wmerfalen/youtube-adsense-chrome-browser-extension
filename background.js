@@ -12,10 +12,12 @@ let funcs = {
 	},
 	'storage': {
 		'ni_open': (ni_opened) => {
+			console.log('setting storage locally to: ',ni_opened);
 			chrome.storage.local.set({'ni_open': ni_opened }, function() {});
 		},
 		'get_ni': (cb) => {
 			chrome.storage.local.get('ni_open', (result) => {
+				console.log('got local storage items:',result);
 				if(cb){
 					cb(result.ni_open);
 				}

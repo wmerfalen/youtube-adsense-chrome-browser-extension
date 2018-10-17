@@ -329,6 +329,7 @@ let terminator = (pattern) => {
 				bnull.create_menu = (items) => {
 					let html = ['<ul id="ni-menu">'];
 					items.on.forEach( category => {
+					console.log(category);
 						html.push([
 							'<li class="ni-menu-item on">',
 							'<a href="javascript:void(0);" ',
@@ -340,6 +341,22 @@ let terminator = (pattern) => {
 							'else{this.children[0].setAttribute("class","fas fa-toggle-on");}\'>',
 							category,
 							'<i class="fas fa-toggle-on"></i>',
+							'</a>',
+							'</li>'
+						].join(''));
+					});
+					items.off.forEach( category => {
+						html.push([
+							'<li class="ni-menu-item off">',
+							'<a href="javascript:void(0);" ',
+							'onclick=\'window.postMessage({"type":"ni_switch_off",',
+							'"category_html": this.innerText,',
+							'"category_class": this.children[0].getAttribute("class")},"*");',
+							'if(this.children[0].getAttribute("class").match(/toggle-on/)){',
+							'this.children[0].setAttribute("class","fas fa-toggle-off");}',
+							'else{this.children[0].setAttribute("class","fas fa-toggle-on");}\'>',
+							category,
+							'<i class="fas fa-toggle-off"></i>',
 							'</a>',
 							'</li>'
 						].join(''));
